@@ -22,6 +22,7 @@ svg{width:105px;height:105px}svg *{stroke:#333;stroke-width:3;stroke-linejoin:ro
 </style></head><body>
 <h1>Nanya Tech Chinese: Flip Cards</h1><p class="s">Tap a card to flip it. Try saying the word first!</p>
 <div class="bar"><button id="sh">Shuffle</button><button id="rs">Reset order</button><button id="hq">Hide Chinese (quiz)</button><button id="fl">Flip all</button></div>
+<div class="bar" id="vc"><button data-g="f" class="on">👩 Girl voice</button><button data-g="m">👨 Boy voice</button><button data-r=".55">🐢 Slow</button><button data-r=".8" class="on">Normal</button><button data-r="1.1">🐇 Fast</button></div>
 <div class="g" id="g"></div>
 <script>
 const S=(x)=>`<svg viewBox="0 0 64 64">${x}</svg>`;
@@ -60,7 +61,8 @@ const D=[
 const SD=["shyo-shee","tsuh-swaw","shung-bing","shuh-jyen","dyen-now","chrr","dyen-dzuh yo-jyen","shoo-roo","hwahng gwahng","hwah-shweh jee-shyeh yen-maw","kwaw-sahn","gahn-shuh shuh-kuh","shuh-shuh shuh-kuh","baw-maw","woo chun shuh","jing ywen chwen-song huh","hwaw","TA run-jung shee-tong","jing ywen","way-chun","joo-lee jee-shoo-ywen","why-jee joo-lee jee-shoo-ywen","jwahng-tie","jing ywen bow-gwan koo","jee tie","run-way shoo-shuh","kong pyen","jrr-chung jong","jing-gow","TA tsow-dzwaw jyeh-myen"];
 const cls={a:"a",b:"b",c:"c2",d:"d"},g=document.getElementById("g");let order=D.map((_,i)=>i);
 function draw(){g.innerHTML=order.map(i=>{const [z,e,p,k,s]=D[i];return `<div class="c ${cls[k]}"><div class="i"><div class="fa"><span class="n">${i+1}</span>${s}<div class="zh${z.length>6?" l":""}">${z}</div></div><div class="ba"><span class="n">${i+1}</span><div class="zh${z.length>6?" l":""}">${z}</div><div class="py">${p}</div><div class="sd">${SD[i]}</div><button class="sp" data-i="${i}">🔊 Listen</button><div class="en">${e}</div></div></div></div>`}).join("");}
-function say(t){try{const s=speechSynthesis;s.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="zh-TW";u.rate=.8;const v=s.getVoices().find(x=>/zh[-_]TW/i.test(x.lang))||s.getVoices().find(x=>/^zh/i.test(x.lang));if(v)u.voice=v;s.speak(u)}catch(_){alert("Sorry, this device can’t speak Chinese here.")}}
+let VG="f",VR=.8;const IOS=/iPad|iPhone|iPod/.test(navigator.userAgent)||(navigator.platform==="MacIntel"&&navigator.maxTouchPoints>1);vc.onclick=e=>{const b=e.target.closest("button");if(!b)return;if(b.dataset.g)VG=b.dataset.g;if(b.dataset.r)VR=+b.dataset.r;[...vc.children].forEach(x=>x.classList.toggle("on",x.dataset.g===VG||(x.dataset.r!==undefined&&+x.dataset.r===VR)))};
+function say(t){try{const s=speechSynthesis;if(s.speaking||s.pending)s.cancel();if(s.resume)s.resume();setTimeout(()=>{const V=s.getVoices().filter(x=>/^zh/i.test(x.lang)),u=new SpeechSynthesisUtterance(t),M=/li-?mu|yu-?shu|kangkang|yunjian|yunxi|zhiwei|danny/i,F=/mei-?jia|ting-?ting|sin-?ji|huihui|yaoyao|hsiao|zhiyu|xiaoxiao/i,tw=x=>(/zh[-_]TW/i.test(x.lang)?0:2)+(/premium|enhanced/i.test(x.name)?0:1),L=V.filter(x=>(VG==="m"?M:F).test(x.name)).sort((a,b)=>tw(a)-tw(b)),v=L[0]||V.sort((a,b)=>tw(a)-tw(b))[0];u.lang=v?v.lang:"zh-TW";if(v)u.voice=v;u.rate=IOS?VR*.55:VR;u.pitch=L[0]?1:(VG==="m"?.6:1.3);s.speak(u)},60)}catch(_){alert("Sorry, this device can’t speak Chinese here.")}}
 g.onclick=e=>{const b=e.target.closest(".sp");if(b){say(D[b.dataset.i][0]);return}const c=e.target.closest(".c");if(c)c.classList.toggle("f")};
 sh.onclick=()=>{order.sort(()=>Math.random()-.5);draw()};rs.onclick=()=>{order=D.map((_,i)=>i);draw()};
 hq.onclick=()=>{g.classList.toggle("q");hq.classList.toggle("on")};
