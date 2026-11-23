@@ -1,0 +1,69 @@
+<!DOCTYPE html><html lang="en"><head><meta charset="utf-8"><meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover"><title>Chinese Flip Cards</title>
+<style>
+:root{--bg:#fafaf7;--tx:#222;--sub:#666;--a:#f4a261;--b:#4dabf7;--c:#51cf66;--d:#b197fc;box-sizing:border-box;padding-top:env(safe-area-inset-top,0px);padding-bottom:env(safe-area-inset-bottom,0px)}
+@media (prefers-color-scheme:dark){:root:not([data-theme="light"]){--bg:#1b1b1f;--tx:#f1f1f1;--sub:#aaa}}
+:root[data-theme="dark"]{--bg:#1b1b1f;--tx:#f1f1f1;--sub:#aaa}
+html,body{margin:0}body{background:var(--bg);color:var(--tx);font-family:Arial,"Microsoft JhengHei",sans-serif;padding:16px}
+h1{font-size:22px;text-align:center;margin:0 0 4px}p.s{text-align:center;color:var(--sub);margin:0 0 12px;font-size:14px}
+.bar{display:flex;gap:8px;justify-content:center;flex-wrap:wrap;margin-bottom:14px}
+button{font:inherit;padding:8px 14px;border-radius:20px;border:2px solid var(--tx);background:transparent;color:var(--tx);cursor:pointer}
+button.on{background:var(--tx);color:var(--bg)}
+.g{display:grid;grid-template-columns:repeat(auto-fill,minmax(150px,1fr));gap:12px;max-width:1000px;margin:auto}
+.c{height:210px;perspective:800px;cursor:pointer}
+.i{position:relative;width:100%;height:100%;transition:transform .5s;transform-style:preserve-3d}
+.c.f .i{transform:rotateY(180deg)}
+.fa,.ba{position:absolute;inset:0;backface-visibility:hidden;border-radius:16px;border:3px solid;display:flex;flex-direction:column;align-items:center;justify-content:center;gap:4px;padding:8px;text-align:center;background:#fff;color:#222}
+.ba{transform:rotateY(180deg)}
+.n{position:absolute;top:6px;left:10px;font-size:13px;font-weight:bold}
+svg{width:105px;height:105px}svg *{stroke:#333;stroke-width:3;stroke-linejoin:round;stroke-linecap:round}svg text{stroke:none;fill:#333;font:bold 13px Arial}
+.zh{font-size:26px;font-weight:bold}.zh.l{font-size:19px}.en{font-size:20px;font-weight:bold}.py{font-size:15px;font-style:italic;color:#555}.sd{font-size:19px;font-weight:bold;color:#c2255c;background:#fff;border-radius:10px;padding:2px 8px}
+.a .fa,.a .ba{border-color:var(--a);background:#fff4e6}.b .fa,.b .ba{border-color:var(--b);background:#e7f5ff}.c2 .fa,.c2 .ba{border-color:var(--c);background:#ebfbee}.d .fa,.d .ba{border-color:var(--d);background:#f3f0ff}
+.q .fa .zh{visibility:hidden}.sp{padding:3px 14px;font-size:14px;background:#c2255c;color:#fff;border-color:#c2255c}
+</style></head><body>
+<h1>Nanya Tech Chinese: Flip Cards</h1><p class="s">Tap a card to flip it. Try saying the word first!</p>
+<div class="bar"><button id="sh">Shuffle</button><button id="rs">Reset order</button><button id="hq">Hide Chinese (quiz)</button><button id="fl">Flip all</button></div>
+<div class="g" id="g"></div>
+<script>
+const S=(x)=>`<svg viewBox="0 0 64 64">${x}</svg>`;
+const D=[
+["休息","Rest","Xiūxí","a",S(`<rect x="4" y="40" width="56" height="14" rx="4" fill="#74c0fc"/><circle cx="20" cy="34" r="10" fill="#ffd8a8"/><path d="M14 33q3 3 6 0M24 33q3 3 6 0" fill="none"/><text x="38" y="26">Z z z</text>`)],
+["廁所","Toilet","Cèsuǒ","a",S(`<rect x="18" y="6" width="28" height="18" rx="3" fill="#fff"/><path d="M12 28h40q0 18-14 20v8H26v-8Q12 46 12 28z" fill="#fff"/>`)],
+["生病","To be sick","Shēngbìng","a",S(`<circle cx="32" cy="34" r="22" fill="#b7e4a0"/><path d="M20 30l6 4m0-4l-6 4M38 30l6 4m0-4l-6 4M24 46q8-6 16 0" fill="none"/><path d="M34 45l22-10" stroke="#d33"/>`)],
+["時間","Time","Shíjiān","a",S(`<circle cx="32" cy="36" r="22" fill="#fff"/><path d="M32 36V22M32 36l10 6M12 16l8-8M52 16l-8-8" fill="none"/>`)],
+["電腦","Computer","Diànnǎo","a",S(`<rect x="6" y="8" width="52" height="34" rx="4" fill="#74c0fc"/><path d="M32 42v10M18 54h28M14 32l10-8 8 6 14-12" fill="none"/>`)],
+["吃","Eat","Chī","a",S(`<path d="M6 32h52q0 20-26 20T6 32z" fill="#e76f51"/><ellipse cx="32" cy="30" rx="24" ry="8" fill="#fff"/><path d="M40 4l-10 24M48 6L36 28" fill="none"/>`)],
+["電子郵件","E-mail","Diànzǐ yóujiàn","a",S(`<rect x="6" y="14" width="52" height="36" rx="4" fill="#ffe066"/><path d="M6 16l26 20 26-20" fill="none"/>`)],
+["輸入","Enter","Shūrù","a",S(`<rect x="6" y="12" width="52" height="40" rx="8" fill="#dee2e6"/><path d="M44 22v14H22M30 28l-8 8 8 8" fill="none"/>`)],
+["黃光","Photo (PH)","Huáng guāng","b",S(`<circle cx="32" cy="26" r="15" fill="#ffe066"/><rect x="26" y="42" width="12" height="10" fill="#adb5bd"/><path d="M32 2v4M8 26h4M52 26h4M14 8l3 3M50 8l-3 3" fill="none"/>`)],
+["化學機械研磨","CMP","Huàxué jīxiè yánmó","b",S(`<ellipse cx="32" cy="48" rx="26" ry="8" fill="#adb5bd"/><rect x="14" y="14" width="36" height="18" rx="4" fill="#74c0fc"/><path d="M32 32v10M22 8l-6-4M42 8l6-4" fill="none"/>`)],
+["擴散","Diffusion (DF)","Kuòsàn","b",S(`<circle cx="32" cy="32" r="8" fill="#f783ac"/><circle cx="12" cy="12" r="4" fill="#f783ac"/><circle cx="52" cy="12" r="4" fill="#f783ac"/><circle cx="12" cy="52" r="4" fill="#f783ac"/><circle cx="52" cy="52" r="4" fill="#f783ac"/><path d="M24 24l-8-8M40 24l8-8M24 40l-8 8M40 40l8 8" fill="none"/>`)],
+["乾式蝕刻","Dry Etch (EH)","Gānshì shíkè","b",S(`<ellipse cx="32" cy="50" rx="26" ry="8" fill="#adb5bd"/><path d="M18 8q6 6 0 12t0 12M32 8q6 6 0 12t0 12M46 8q6 6 0 12t0 12" fill="none"/><text x="20" y="62">DRY</text>`)],
+["濕式蝕刻","Wet Etch (WET)","Shīshì shíkè","b",S(`<ellipse cx="32" cy="50" rx="26" ry="8" fill="#adb5bd"/><path d="M16 6l6 12a6 6 0 1 1-12 0zM32 6l6 12a6 6 0 1 1-12 0zM48 6l6 12a6 6 0 1 1-12 0z" fill="#4dabf7"/>`)],
+["薄膜","Thin Film (TF)","Bómó","b",S(`<rect x="6" y="40" width="52" height="12" fill="#adb5bd"/><rect x="6" y="28" width="52" height="8" fill="#ffa94d"/><rect x="6" y="18" width="52" height="6" fill="#69db7c"/><rect x="6" y="10" width="52" height="4" fill="#da77f2"/>`)],
+["無塵室","Cleanroom (FAB)","Wú chén shì","b",S(`<circle cx="32" cy="20" r="14" fill="#fff"/><rect x="22" y="22" width="20" height="10" rx="3" fill="#a5d8ff"/><path d="M10 60q0-26 22-26t22 26z" fill="#fff"/>`)],
+["晶圓傳送盒","FOUP","Jīng yuán chuánsòng hé","c",S(`<rect x="10" y="16" width="44" height="40" rx="5" fill="#ffd43b"/><path d="M18 28h28M18 38h28M18 48h28M24 16v-6h16v6" fill="none"/>`)],
+["貨","Lot","Huò","c",S(`<rect x="6" y="34" width="24" height="22" fill="#d9a066"/><rect x="34" y="34" width="24" height="22" fill="#d9a066"/><rect x="20" y="10" width="24" height="22" fill="#d9a066"/><text x="22" y="26">LOT</text>`)],
+["TA 認證系統","TAC","TA rènzhèng xìtǒng","d",S(`<path d="M32 4l22 8v18q0 20-22 30Q10 50 10 30V12z" fill="#69db7c"/><path d="M22 32l8 8 14-16" fill="none" stroke-width="5"/>`)],
+["晶圓","Wafer","Jīng yuán","c",S(`<circle cx="32" cy="32" r="26" fill="#ced4da"/><path d="M18 20h28M12 32h40M18 44h28M24 8v48M40 8v48" fill="none" stroke-width="2"/>`)],
+["微塵","Particle","Wéichén","c",S(`<circle cx="26" cy="26" r="18" fill="#e7f5ff"/><path d="M40 40l16 16" stroke-width="6"/><circle cx="20" cy="22" r="3" fill="#555"/><circle cx="30" cy="30" r="2" fill="#555"/><circle cx="32" cy="19" r="2" fill="#555"/>`)],
+["助理技術員","TA","Zhùlǐ jìshùyuán","d",S(`<circle cx="32" cy="34" r="16" fill="#ffd8a8"/><path d="M14 30q0-20 18-20t18 20z" fill="#ffd43b"/><path d="M26 36h.1M38 36h.1M26 43q6 4 12 0" fill="none"/><path d="M54 44l6-6" stroke-width="5"/>`)],
+["外籍助理技術員","OTA","Wàijí zhùlǐ jìshùyuán","d",S(`<circle cx="22" cy="38" r="14" fill="#ffd8a8"/><path d="M8 34q0-18 14-18t14 18z" fill="#ffd43b"/><path d="M18 40q4 4 8 0" fill="none"/><circle cx="48" cy="18" r="12" fill="#74c0fc"/><path d="M36 18h24M48 6q-8 12 0 24M48 6q8 12 0 24" fill="none" stroke-width="2"/>`)],
+["狀態","Status","Zhuàngtài","d",S(`<rect x="20" y="4" width="24" height="56" rx="8" fill="#495057"/><circle cx="32" cy="16" r="6" fill="#ff6b6b"/><circle cx="32" cy="32" r="6" fill="#ffd43b"/><circle cx="32" cy="48" r="6" fill="#51cf66"/>`)],
+["晶圓保管庫","Stocker","Jīng yuán bǎoguǎn kù","c",S(`<path d="M6 8v48M58 8v48M6 30h52M6 56h52M6 8h52" fill="none"/><rect x="12" y="14" width="14" height="14" fill="#ffd43b"/><rect x="32" y="14" width="14" height="14" fill="#ffd43b"/><rect x="22" y="38" width="14" height="14" fill="#ffd43b"/>`)],
+["機台","Equipment","Jī tái","d",S(`<rect x="6" y="14" width="52" height="38" rx="4" fill="#a5d8ff"/><circle cx="20" cy="30" r="8" fill="#fff"/><path d="M20 30l4-4M36 24h16M36 34h16M14 52v6M50 52v6" fill="none"/>`)],
+["人為疏失","Miss Operation (MO)","Rénwéi shūshī","d",S(`<circle cx="32" cy="32" r="26" fill="#ff8787"/><path d="M20 20l24 24M44 20L20 44" stroke="#fff" stroke-width="6"/>`)],
+["控片","Monitor","Kòng piàn","d",S(`<rect x="6" y="6" width="52" height="36" rx="4" fill="#fff"/><path d="M12 34l10-12 8 8 12-18" fill="none"/><ellipse cx="32" cy="52" rx="24" ry="6" fill="#adb5bd"/>`)],
+["製程中","Run","Zhìchéng zhōng","d",S(`<circle cx="32" cy="32" r="26" fill="#69db7c"/><path d="M26 20l18 12-18 12z" fill="#fff"/>`)],
+["警告","Alarm","Jǐnggào","d",S(`<path d="M14 50q0-30 18-30t18 30z" fill="#ff6b6b"/><rect x="8" y="50" width="48" height="8" rx="2" fill="#868e96"/><path d="M32 6v8M10 14l5 5M54 14l-5 5" fill="none"/>`)],
+["TA操作介面","OPI","TA cāozuò jièmiàn","d",S(`<rect x="8" y="6" width="48" height="52" rx="6" fill="#343a40"/><rect x="14" y="12" width="36" height="20" fill="#a5d8ff"/><circle cx="20" cy="42" r="4" fill="#51cf66"/><circle cx="32" cy="42" r="4" fill="#ffd43b"/><circle cx="44" cy="42" r="4" fill="#ff6b6b"/>`)]
+];
+const SD=["shyo-shee","tsuh-swaw","shung-bing","shuh-jyen","dyen-now","chrr","dyen-dzuh yo-jyen","shoo-roo","hwahng gwahng","hwah-shweh jee-shyeh yen-maw","kwaw-sahn","gahn-shuh shuh-kuh","shuh-shuh shuh-kuh","baw-maw","woo chun shuh","jing ywen chwen-song huh","hwaw","TA run-jung shee-tong","jing ywen","way-chun","joo-lee jee-shoo-ywen","why-jee joo-lee jee-shoo-ywen","jwahng-tie","jing ywen bow-gwan koo","jee tie","run-way shoo-shuh","kong pyen","jrr-chung jong","jing-gow","TA tsow-dzwaw jyeh-myen"];
+const cls={a:"a",b:"b",c:"c2",d:"d"},g=document.getElementById("g");let order=D.map((_,i)=>i);
+function draw(){g.innerHTML=order.map(i=>{const [z,e,p,k,s]=D[i];return `<div class="c ${cls[k]}"><div class="i"><div class="fa"><span class="n">${i+1}</span>${s}<div class="zh${z.length>6?" l":""}">${z}</div></div><div class="ba"><span class="n">${i+1}</span><div class="zh${z.length>6?" l":""}">${z}</div><div class="py">${p}</div><div class="sd">${SD[i]}</div><button class="sp" data-i="${i}">🔊 Listen</button><div class="en">${e}</div></div></div></div>`}).join("");}
+function say(t){try{const s=speechSynthesis;s.cancel();const u=new SpeechSynthesisUtterance(t);u.lang="zh-TW";u.rate=.8;const v=s.getVoices().find(x=>/zh[-_]TW/i.test(x.lang))||s.getVoices().find(x=>/^zh/i.test(x.lang));if(v)u.voice=v;s.speak(u)}catch(_){alert("Sorry, this device can’t speak Chinese here.")}}
+g.onclick=e=>{const b=e.target.closest(".sp");if(b){say(D[b.dataset.i][0]);return}const c=e.target.closest(".c");if(c)c.classList.toggle("f")};
+sh.onclick=()=>{order.sort(()=>Math.random()-.5);draw()};rs.onclick=()=>{order=D.map((_,i)=>i);draw()};
+hq.onclick=()=>{g.classList.toggle("q");hq.classList.toggle("on")};
+fl.onclick=()=>{const cs=[...g.children],all=cs.every(c=>c.classList.contains("f"));cs.forEach(c=>c.classList.toggle("f",!all))};
+draw();
+</script></body></html>
